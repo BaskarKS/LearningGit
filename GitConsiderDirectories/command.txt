@@ -1,0 +1,13 @@
+# git never give special importance for directories
+# git will only track / stage / worry about files , doesnt bother directories
+
+Eg: If a new directory is created without any files, its not tracked or staged
+by Git. which clearly shows that git doesnt bother about directories
+
+# touch dir1/{a..d}.py 
+# create a.py, b.py, c.py, d.py - 4 python files
+
+# whenever we are adding files then implicitly directories are also addedby git
+# git add . # will add all untracked and non-ignored files from working directory
+
+

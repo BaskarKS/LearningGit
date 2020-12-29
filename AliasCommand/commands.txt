@@ -1,0 +1,24 @@
+touch a.txt b.txt c.txt
+git add a.txt; git commit -m "a.txt added"
+git add b.txt; git commit -m "b.txt added"
+git add c.txt; git commit -m "c.txt added"
+
+creating alias for a command using "git config" command
+git config --global alias.aliasName "original command" - for all repositories
+// git alias for log --oneline
+Eg: git config --global alias.one "log --oneline"
+# "git one" will produce results of "git log --oneline"
+
+Ex -2 
+create alias name "s" for the following git command "git status"
+# git config --global alias.s "status"
+
+
+// change aliases commands
+// where aliases will be stored?
+// special file contains all configuration information which is ".gitconfig"
+//which contains all configuration information, its stored in users home directory
+
+
+//Life span of Alias
+// since we used "--global" its permanent
