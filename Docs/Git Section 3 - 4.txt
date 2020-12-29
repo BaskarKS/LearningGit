@@ -1,0 +1,1124 @@
+-------------------------------------------------------------------------------------------
+								SECTION 3 - BRANCHING
+-------------------------------------------------------------------------------------------
+* using Branches
+* compare Branches
+* Merge Branches
+* Resolve conflicts
+* undo a faulty merge
+* Essential Tools use (Stashing, Cherry Picking)
+
+-------------------------------------------------------------------------------------------
+								WHAT IS BRANCHING
+-------------------------------------------------------------------------------------------
+Branching allow us to diverge from main line of work, and work something else (features)
+in isolation, without messing the main line of work
+Branching is seperate isolated workspace. after working on different feature in the 
+branch, once the code is stable its brought into the master branch(this is called merging)
+
+Its like a seperate isolated work space.
+Main workpace     - Master branch (its just a pointer to last commit in main line of work, 
+					for every new commit, git moves this pointer automatically)
+Feature workspace - Feature branch
+
+In subversion code management, to create a branch it will create a different directory by making a 
+copy of the master directory. where large projects has several thousands of files, to create 
+a copy of dir will lot of time and maintenance.
+In git branch is not a different workspace, its the same current workspace loaded with the 
+branch snapshot of code.
+But git is super fast, it doesnt create a copy of working directory, It manages with pointers
+current working directory is pointed by "master" pointer. If we create a new branch, git create a
+pointer with the branch name which can be moved around and points the same working directory. 
+
+HEAD is the pointer/file which contains the details about the current branch which we are 
+working on. git know the current branch which we are working though the HEAD
+
+Current working of code can be determined by the HEAD pointer pointing to, if HEAD points to master, 
+then we work on master branch, If HEAD points to "new branch name", then it means we are 
+working on "new branch", if we switch to the relevent branch then git will load the particular
+branch snap shot to the working directory. 
+
+Eg: If we switch to master branch, then HEAD is pointed to master also, the master branch snapshot
+is loaded to our current working directory.
+                                 All branch management is just done with pointers, and snapshot load
+mechanisms.                                 
+
+---------------------------------------------------------------------------------------------
+						WORKING WITH BRANCHES
+---------------------------------------------------------------------------------------------
+
+Create a new Branch for other work(fix a bug / work on a feature)
+>> git branch branch-name
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git branch bugfix
+
+to see the list of branch in our working dir / local repository
+>> git branch
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git branch
+  bugfix
+* master                     <= '*' determins the current selected/active branch
+
+another way to see the current selected / active branch is using
+>> git status
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+nothing to commit, working tree clean
+
+changing the branch, or select a branch to be active to work on
+2 ways to do this
+1. git checkout branchname
+2. git switch branchname
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch bugfix
+Switched to branch 'bugfix'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix  git status
+On branch bugfix
+nothing to commit, working tree clean
+
+to rename a branch name
+>> git branch -m oldbranchname newbranchname
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix  git branch -m bugfix bugfix-signup-form
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git status
+On branch bugfix-signup-form
+nothing to commit, working tree clean
+
+make changes in a source file "audience.txt"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git status
+On branch bugfix-signup-form
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   audience.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form ●  git add .
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form ✚  git commit -m "fix the bug that prevented user sign-up form"
+[bugfix-signup-form 5ac5d5c] fix the bug that prevented user sign-up form
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git log --oneline
+5ac5d5c (HEAD -> bugfix-signup-form) fix the bug that prevented user sign-up form
+03d4871 (master) restored toc.txt file which got removed
+5fa6a6b toc.txt file got removed
+a642e12 (tag: v0.9) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+changes submitted are only visible in "bugfix-signup-form" branch, its not visible in master
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git switch master
+Switched to branch 'master'
+
+// here we can see HEAD is pointing to 'master'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+03d4871 (HEAD -> master) restored toc.txt file which got removed
+5fa6a6b toc.txt file got removed
+a642e12 (tag: v0.9) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+branches allow us to work on different tasks in isolation, after working at some point we
+merge the code together
+
+to delete a branch
+>> git branch -d branch-name
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git branch -d bugfix-signup-form
+error: The branch 'bugfix-signup-form' is not fully merged.
+
+If there are commits in the branch we are deleting, which is not merged yet into master
+git will not allow us to delete it if we use '-d' option
+
+to forefully delete the branch
+>> git branch -D branch-name
+If you are sure you want to delete it, run 'git branch -D bugfix-signup-form'.
+
+
+--------------------------------------------------------------------------------------------------
+COMPARING BRANCHES
+--------------------------------------------------------------------------------------------------
+
+to get details about the commits happenned in 'bugfix-signup-form' branch but not in 'master'.
+
+>> git log master..bugfix-signup-form
+>> git log master..branch-name
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  
+git log --oneline master..bugfix-signup-form
+
+5ac5d5c (bugfix-signup-form) fix the bug that prevented user sign-up form
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  
+git diff master..bugfix-signup-form
+
+diff --git a/audience.txt b/audience.txt
+index 4cfef55..776bf72 100644
+--- a/audience.txt
++++ b/audience.txt
+@@ -1,4 +1,3 @@
+-AUDIENCE 
+-
++WHO THIS COURSE IS FOR 
++==========================================================
+ This course is for anyone who wants to learn Git. 
+-No prior experience is required.
+\ No newline at end of file
+
+--------------------
+To see the code difference between the master and bugfix-signup-form(branch)
+>> git diff master..bugfix-signup-form
+
+can also write in a shortway
+>> git diff bugfix-signup-form
+
+--------------------
+To see the only file changed between the master and bugfix-signup-form(branch)
+>> git diff --name-only master..bugfix-signupform
+audience.txt
+
+>> git diff --name-status bugfix-signupform
+M       audience.txt
+
+--------------------------------------------------------------------------------------------------
+											STASHING
+--------------------------------------------------------------------------------------------------
+when we switch to a branch
+Git will reset our working directory with the snapshot stored in the last commit of the target branch
+
+If we have local changes in working directory which still be didnt commited yet, these changes will get
+lost while switching branch, Hence git will not allow to switch branch if we have local changes which
+is still not commited yet.
+
+we have 'master' and 'bugfix-signup-form' branch
+currently we are in master branch
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+nothing to commit, working tree clean
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch bugfix-signup-form
+Switched to branch 'bugfix-signup-form'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git status
+On branch bugfix-signup-form
+nothing to commit, working tree clean
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git switch master
+Switched to branch 'master'
+
+//currently we are in master branch
+// make changes in Audience.txt file
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git s
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   audience.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+// Have Local changes in audience.txt and we try to switch to bugfix-signup-form branch
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git switch bugfix-signup-form
+error: Your local changes to the following files would be overwritten by checkout:
+	audience.txt
+Please commit your changes or stash them before you switch branches.
+Aborting
+
+----------------------
+have to stash the changes before we switch the branch. Stashing means storing in a safe place, its 
+store somewhere in Git repository but it will not be part of the history
+
+>> git stash push -m "Message of the changes" 
+current changes(only git tracked files) in working directory is saved with a descriptive message
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash push -m "Changes in audience.txt"
+Saved working directory and index state On master: Changes in audience.txt
+
+--------------------------------------------------------
+if we have new file defined and made changes in it in our working directory, if we try to stash
+the file it will not be stashed because the file is not git tracked.
+
+to include the untracked files to be stashed we should use '-a' option
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+nothing to commit, working tree clean
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  echo hello > newfile.txt
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	newfile.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash push -a -m "New File added stash"
+Saved working directory and index state On master: New File added stash
+--------------------------------------------------------------------------------
+to view the list of stashes made use 'list'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash list  
+stash@{0}: On master: New File added stash
+stash@{1}: On master: Changes in audience.txt
+
+"UniqueID" of the stash is stash@{0}
+----------------------------------------------------
+After stashing we are allowed to switch to other branches
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch bugfix-signup-form
+Switched to branch 'bugfix-signup-form'
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git branch
+* bugfix-signup-form
+  master
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-signup-form  git checkout master
+Switched to branch 'master'
+
+----------------------------------------------------------
+Recovering the local changes back, from the stash
+
+To see the files changed in the stash using 'show'
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash list
+stash@{0}: On master: New File added stash
+stash@{1}: On master: Changes in audience.txt
+
+//both the below commands are same
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash show stash@{1}
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash show 1       
+
+audience.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+//stash number 1 has the above information, audience.txt file changed with 1 insertion and 1 deletion
+
+// to recover changes into working directory from the stash
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+nothing to commit, working tree clean
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash list
+stash@{0}: On master: New File added stash
+stash@{1}: On master: Changes in audience.txt
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git stash apply 1
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   audience.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   audience.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+/* 
+we have applied/recovered stash 1 to our working directory but its not removed from
+stash list, we have to manually remove the stash entry, it will not get removed when we
+apply it.
+*/
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash list
+stash@{0}: On master: New File added stash
+stash@{1}: On master: Changes in audience.txt
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash drop 1
+Dropped refs/stash@{1} (3699a4f76b95eeb90eeaf2e471dce9fc94f0b24b)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash list
+stash@{0}: On master: New File added stash
+
+// to remove all stash entries which we have added to stash list
+>> git stash clear
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash list
+stash@{0}: On master: New File added stash
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash clear
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git stash list
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  
+
+
+
+--------------------------------------------------------------------------------------------------
+											MERGING
+--------------------------------------------------------------------------------------------------
+
+its bringing changes from one branch into another
+Merges:
+1. Fast Forward Merges. (if branches are not diverged)
+2. 3-way merges. (if branches are diverged)
+
+1. Fast-Forward merge:
+	master and feature-branch both are just pointer to the commit tree, when we do some commits
+	in feature-branch the feature-branch is pointing ahead to master because of the changes
+	committed, master pointer is trailing behind, fast-forward merge is just bringing master 
+	to point to the same commit where feature-branch is pointing.
+
+	if two branches (master, feature-branch) are not diverged and there is a direct linear path
+	from the target(feature-branch) branch to source(master) branch, git runs fast-forward merge
+	it simply brings the pointer of source branch forward and this makes the source(master)
+	branch point to the same location where (feature-branch) is pointing at. and the pointer
+	(feature-branch) is just removed automatically.
+
+2. 3-way merge:
+	feature-branch is 2 commits ahead of master, also master has an additional commit after the
+	feature-branch is branched out. now our branches are diverged.
+	now we have some changes in master that dont exist in feature-branch. now if we try to merge, git
+	cant simply move the master branch pointer to point at feature-branch.(if we do so, then we will
+	lose the changes committed in master branch which was done after feature-branch is branch out)
+	Hence in this case, when we try to merge both the branch, git  creates a new commit that combines
+	the changes from these two(master, feature-branch) branches.
+	THis is called a 3-way merge because, the new commit is based on 3 different commits (the common
+	ancestor of master and feature-branch(before code), tip of master branch(after code, tip of 
+	feature-branch(after code)). git looks at all these 3 snapshots (before snapshot and after snapshots)
+	based on these three it combine the changes and creates a new commit called (merge-commit)
+ 
+--------------------------------------------------------------------------------------------------
+											FAST-FORWARD MERGES
+--------------------------------------------------------------------------------------------------
+
+merging changes from 'bugfix-signup-form' into 'master' branch
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* 5ac5d5c (bugfix-signup-form) fix the bug that prevented user sign-up form
+* 03d4871 (HEAD -> master) restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+first be on 'master' branch, 
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch master
+Already on 'master'
+
+
+since the path of 'bugfix-signup-form' and 'master' branch are on same path(path is not diverged)
+we are on master branch, issuing git merge "branch-name"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git merge bugfix-signup-form
+Updating 03d4871..5ac5d5c
+Fast-forward
+ audience.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+we could see now master and bugfix-signup-form are pointing to the same commit, changes merged to master
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* 5ac5d5c (HEAD -> master, bugfix-signup-form) fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+----------------------------------------------------------------
+Example-2 for fast-forward merge
+
+create and switch to new branch in a single command
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch -C bugfix
+Switched to a new branch 'bugfix'
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix  
+
+// made code changes to toc.txt file
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix ●  git add .
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix ✚  git commit -m "fixed bug in bugfix branch"
+[bugfix 6f0cfbc] fixed bug in bugfix branch
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix  git log --oneline --all --graph
+* 6f0cfbc (HEAD -> bugfix) fixed bug in bugfix branch
+* 5ac5d5c (master) fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+
+// make comit with no fast-forward option, even if fast-forward is possible, asking
+git not to do fast forward merge
+
+// move to master branch on which the merge has to happen
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix  git switch master
+Switched to branch 'master'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* 6f0cfbc (bugfix) fixed bug in bugfix branch
+* 5ac5d5c (HEAD -> master) fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+
+// give an extra option '--no-ff' to merge to avoid fast-forward merge and create a commit and do
+// a explicit merge.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git merge --no-ff bugfix 
+Merge made by the 'recursive' strategy.
+ toc.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+*   4380b80 (HEAD -> master) Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc (bugfix) fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+// 6f0cfbc (bugfix) branch is originated from 5ac5d5c branch, changes in 6f0cfbc commit is
+// merged to master by forming a new commit 4380b80.
+
+// Benefits of disabling fast-forward merge
+	* allows easier way of reverting a commit
+
+// Disabling fast-forward merges in our repository / all repository
+>> git config ff no // disable fast-forward only in current respository
+
+>> git config --global ff no // disable fast-forward in all respository
+
+
+--------------------------------------------------------------------------------------------------
+											THREE-WAY MERGES
+--------------------------------------------------------------------------------------------------
+
+when the branch diverge, git will go for 3 way merge by merging the latest of master and latest of branch
+with the changes from the commit where the branch and master diverge, these three commits are compared and
+the changes are committed with a new commit in git.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+*   4380b80 (HEAD -> master) Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc (bugfix) fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+"4380b80" is the latest commit id.
+
+Creating a new branch for new feature
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch -C feature-change-password
+Switched to a new branch 'feature-change-password'
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password  
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password  git log --oneline --all --graph
+*   4380b80 (HEAD -> feature-change-password, master) Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+HEAD -> "feature-change-password", "master" both the branches pointing to the same commit "380b80 "
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password  echo hello > change-password.txt
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password  git add .
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password ✚  git commit -m "Feature Change password submitted"
+[feature-change-password d75e350] Feature Change password submitted
+ 1 file changed, 1 insertion(+)
+ create mode 100644 change-password.txt
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password  git log --oneline --all --graph
+* d75e350 (HEAD -> feature-change-password) Feature Change password submitted
+*   4380b80 (master) Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+
+"d75e350" is the new commit submitted on "feature-change-password" branch. now "feature-change-password"
+is ahead of "master" branch
+
+switch back to "master" branch, and make a new commit in master branch to make the commit path 
+diverge.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   feature-change-password  git switch master
+Switched to branch 'master'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  code objectives.txt 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git add .
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚  git commit -m "made changes in objective.txt"
+[master 28275c0] made changes in objective.txt
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* 28275c0 (HEAD -> master) made changes in objective.txt
+| * d75e350 (feature-change-password) Feature Change password submitted
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+we can see "master" is pointing at "28275c0" and "feature-change-password" is pointing
+at "d75e350". the path is diverged
+
+there is no linear path from feature-change-password to master branch.
+
+the tip of "master" branch is "28275c0" and tip of "feature-change-password" branch is 
+d75e350. will be merged with "4380b80" commit (this is the root commit where diverge happen). 
+If we merge, all these 3 commits are merged and form a new commit. 
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git merge feature-change-password
+
+Merge made by the 'recursive' strategy.
+ change-password.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 change-password.txt
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+*   ca63665 (HEAD -> master) Merge branch 'feature-change-password' into master
+|\  
+| * d75e350 (feature-change-password) Feature Change password submitted
+* | 28275c0 made changes in objective.txt
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+"d75e350" commit of feature-change-password" branch. "28275c0" commit of "master" branch
+and "4380b80" is the root commit where diverge happenned is 3-way merge happenned and 
+"ca63665" commit was submitted into git.
+
+--------------------------------------------------------------------------------------------------
+							VIEWING MERGED AND UNMERGED BRANCHES
+--------------------------------------------------------------------------------------------------
+
+to view the list of branches which is already merged into the "master" branch.
+>git branch --merged
+
+  feature-change-password
+* master
+
+after finishing working on a branch, better delete the branch to avoid confusion in future.
+
+to delete a branch
+>git branch -d feature-change-password
+
+to see the branches which still not merged into the "master" branch
+> git branch --no-merged
+
+--------------------------------------------------------------------------------------------------
+							MERGE CONFLICTS
+--------------------------------------------------------------------------------------------------
+
+same line of code changed in different ways in different branches.
+file changed in one branch and its deleted in another branch.
+same file is added in 2 different branches, and both the file contents are different.
+
+the above conflicts have to be manually sorted out using three-way merge tool.
+
+create a new branch "bugfix-change-password"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git switch -C bugfix-change-password 
+Switched to a new branch 'bugfix-change-password'
+
+change content in change-password.txt
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-change-password  git status
+On branch bugfix-change-password
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   change-password.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-change-password ±  git add .
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-change-password ✚  git commit -m "update in change-password.txt"
+[bugfix-change-password 9b72217] update in change-password.txt
+ 1 file changed, 1 insertion(+)
+
+"switch to master branch"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   bugfix-change-password  git switch master
+Switched to branch 'master'
+
+update the same "change-password.txt" file in a different way
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  code change-password.txt 
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   change-password.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ±  git add .
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚  git commit -m "changed change-password.txt file in master"
+[master 8fbbe5c] changed change-password.txt file in master
+ 1 file changed, 1 insertion(+)
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* 8fbbe5c (HEAD -> master) changed change-password.txt file in master
+| * 9b72217 (bugfix-change-password) update in change-password.txt
+|/  
+* ebe6fd5 added new check-merged branch file
+*   ca63665 Merge branch 'feature-change-password' into master
+|\  
+| * d75e350 Feature Change password submitted
+* | 28275c0 made changes in objective.txt
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+"8fbbe5c" in this commit "change-password.txt" file is changed in "master" branch
+
+"9b72217"  in this commit "change-password.txt" file is changed in (bugfix-change-password) in branch 
+
+"ebe6fd5" from this commit the branches are diverged in master and bugfix-change-password branch.
+
+if we do a merge the tip of master is "8fbbe5c" and "9b72217" is tip of bugfix-change-password branch,
+"ebe6fd5" is the commit point where both the branches diverge, all these commits are merged
+into a three-way merge. if changes happen in same file it forces to git stop the process and have
+to resolve the conflict with manual conflict resolution
+
+to merge a different branch into master, we move to master first
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git merge bugfix-change-password
+Auto-merging change-password.txt
+CONFLICT (content): Merge conflict in change-password.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ±✚ >M<  git status
+On branch master
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+	both modified:   change-password.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+
+"look for the conflict files in unmerged paths  and resolve it using manual merge"
+"open the conflict file and do manual merge, open change-password.txt file"
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ±✚ >M<   code change-password.txt
+
+<<<<<<< HEAD
+changed in master branch      // code changed in master branch
+=======                       // divider for changes of multiple branch
+change in the bug-fix branch // code changed in bugfix-change-password branch
+>>>>>>> bugfix-change-password
+
+manually monitor the code and include the changes, save the changed file and commit it.
+resolve the problems, dont add new code changes, new code changes will make this commit as "evil commit"
+manually add the files in staging area and commit it
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ±✚ >M<  git add .
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚ >M<  git commit -m "merged both the conflicts manually"
+[master 1a1e424] merged both the conflicts manually
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+*   1a1e424 (HEAD -> master) merged both the conflicts manually
+|\  
+| * 9b72217 (bugfix-change-password) update in change-password.txt
+* | 8fbbe5c changed change-password.txt file in master
+|/  
+* ebe6fd5 added new check-merged branch file
+*   ca63665 Merge branch 'feature-change-password' into master
+|\  
+| * d75e350 Feature Change password submitted
+* | 28275c0 made changes in objective.txt
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+-----------------------------------------------------------------------------
+	CONFIGURE EXTERNAL DIFF TOOL WITH GIT
+-----------------------------------------------------------------------------
+
+>git config --global merge.tool p4merge
+>git config  --global mergetool.p4merge.path "/home/bin..."
+
+>git mergetool 
+it will launch the changes in p4merge
+
+-----------------------------------------------------------------------------
+			ABORTING A MERGE
+-----------------------------------------------------------------------------
+after conflict appears, going back to a state before the conflict happenned
+>git merge --abort
+
+-----------------------------------------------------------------------------
+			UNDOING A FAULTY MERGE
+-----------------------------------------------------------------------------
+
+some situations like, code doesnt work after a submitted merge, code
+doesnt compile after a merge. We can undo the submitted merge
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+*   1a1e424 (HEAD -> master) merged both the conflicts manually
+|\  
+| * 9b72217 (bugfix-change-password) update in change-password.txt
+* | 8fbbe5c changed change-password.txt file in master
+|/  
+* ebe6fd5 added new check-merged branch file
+*   ca63665 Merge branch 'feature-change-password' into master
+|\  
+| * d75e350 Feature Change password submitted
+* | 28275c0 made changes in objective.txt
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+commit "1a1e424" was a merge commit of code changes from "master"
+branch and "bugfix-change-password" branch
+
+want to undo the "1a1e424"  commit / merge
+2 options
+1. removing the commit, which will modify the history (not a good practice if 
+shared across teams)
+2. reverting the changes
+
+1. removing the commit:
+>git reset --hard HEAD~1 (mentioned snapshot is affected in repo and its been copied 
+													to both staging and working dir)
+>git reset --mixed HEAD~1 (mentioned snapshot is affected in repo and its been copied 
+																	only to staging)
+>git reset --soft HEAD~1 (mentioned snapshot is affected only in repo)
+
+*************Be in master branch, want to move to one commit before to master HEAD
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git reset --hard HEAD~1
+HEAD is now at 8fbbe5c changed change-password.txt file in master
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git status
+On branch master
+nothing to commit, working tree clean
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* 8fbbe5c (HEAD -> master) changed change-password.txt file in master
+| * 9b72217 (bugfix-change-password) update in change-password.txt
+|/  
+* ebe6fd5 added new check-merged branch file
+*   ca63665 Merge branch 'feature-change-password' into master
+|\  
+| * d75e350 Feature Change password submitted
+* | 28275c0 made changes in objective.txt
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+2. reverting the changes:
+"git revert HEAD" - reverting the last commit
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git revert HEAD
+error: commit 1a1e424de6853a7a2bf5abede736466641bd5aa0 is a merge but no -m option was given.
+fatal: revert failed
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git revert -m 1 HEAD
+[master ca0696c] Revert "merged both the conflicts manually"
+ 1 file changed, 1 deletion(-)
+
+merge commit has 2 parent, one in master branch and other in feature branch(bugfix-feature-branch)
+and merge happenned in master branch, hence the 1st parent is the parent in master branch, 2nd parent
+is commit in feature-branch.
+
+********** we have to give -m option and mention to which parent number we have to revert back
+"8fbbe5c" is our first parent in master branch, we can mention it by -m 1 (which tells git
+that to revert back to first parent), HEAD is the commit we intend to revert
+
+-------- git revert "to which parent" "which commit intend to revert"
+-------- git revert    "-m 1"             "HEAD"
+
+**** Merge commit is on master branch and first parent should also be in master branch
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all --graph
+* ca0696c (HEAD -> master) Revert "merged both the conflicts manually"
+*   1a1e424 merged both the conflicts manually
+|\  
+| * 9b72217 (bugfix-change-password) update in change-password.txt
+* | 8fbbe5c changed change-password.txt file in master
+|/  
+* ebe6fd5 added new check-merged branch file
+*   ca63665 Merge branch 'feature-change-password' into master
+|\  
+| * d75e350 Feature Change password submitted
+* | 28275c0 made changes in objective.txt
+|/  
+*   4380b80 Merge branch 'bugfix' into master
+|\  
+| * 6f0cfbc fixed bug in bugfix branch
+|/  
+* 5ac5d5c fix the bug that prevented user sign-up form
+* 03d4871 restored toc.txt file which got removed
+* 5fa6a6b toc.txt file got removed
+* a642e12 (tag: v0.9) Add header to all pages.
+* 50db987 Include the first section in TOC.
+* 555b62e Include the note about committing after staging the changes.
+* 91f7d40 Explain various ways to stage changes.
+* edb3594 First draft of staging changes.
+* 24e86ee Add command line and GUI tools to the objectives.
+* 36cd6db Include the command prompt in code sample.
+* 9b6ebfd Add a header to the page about initializing a repo.
+* fa1b75e Include the warning about removing .git directory.
+* dad47ed Write the first draft of initializing a repo.
+* fb0d184 Define the audience.
+* 1ebb7a7 Define the objectives.
+* ca49180 Initial commit.
+
+-----------------------------------------------------------------------------
+			SQUASH MERGING
+-----------------------------------------------------------------------------

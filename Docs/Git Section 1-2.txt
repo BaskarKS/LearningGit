@@ -1,0 +1,1779 @@
+GIT
+1. System Level - All Users
+2. Global Level - All repositories of current user.
+3. Local Level - The current Repository.
+
+-------------------------------------------------------------------------------------------
+CONFIGURING GIT:
+Name: git config --global user.name "Baskar K S" // Space is in between name, hence using double quotes
+Email: "git config --global user.email baskarks@gmail.com"
+Editor: git config --global core.editor "code --wait" // to make terminal to wait until the editor is closed
+Line Endings: "git config --global core.autocrlf normal" //cr- carriage return , lf - line feed, linux=> 'normal', windows => 'true'
+
+To open the config file in editor : "git config --global -e"
+
+-------------------------------------------------------------------------------------------
+Each commit will have the following info
+1. ID
+2. Message
+3. Date / Time
+4. Author
+5. Complete Snapshot of project that point of time, which help to quickly restore the changes
+
+-------------------------------------------------------------------------------------------
+Add files to Staging area:
+"git add file1.txt file2.txt"
+"git add file*"
+"git add *.txt"
+"git add ." => add all files recursively from current directory
+-------------------------------------------------------------------------------------------
+Commit without Staging the changes
+
+1. make changes to code base
+2. "git commit -am "message about changes" => '-a' include all files
+
+-------------------------------------------------------------------------------------------
+Removing Files:
+1. consider a file file2.txt present in working directory, has to be removed.
+2. >> "rm file2.txt" to remove it from working directory, but it will not remove file in staging area
+3. "git status" will show the deleted file file2.txt
+4. "git ls-files" will show the files present in staging area <======== file2.txt
+4. "git add file2.txt"
+5. git commit -m "deleted file2.txt"
+
+1. to remove a file => need to "rm file.txt" and then "git add file.txt" to remove the file
+from both working directory and staging area. this can be combined with a single command "git rm file.txt"
+2. "git rm file.txt" will remove the file physically from working directory and also remove it from staging
+area and also add the file deleted changes to staging area, we just need to commit.
+3. to remove file only from staging area but not from working directory - "git rm --cached file.txt"
+-------------------------------------------------------------------------------------------
+Renaming a file in Git:
+-------------------------------------------------------------------------------------------
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master  mv file1.txt main.java
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ● ?  git status
+On branch master
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	deleted:    file1.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	main.java
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ● ?  git add file1.txt
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ✚ ?  git add main.java 
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ✚  git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	renamed:    file1.txt -> main.java
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ✚ 
+ _______________________________________________________
+ * Instead of renaming explicitly and add the changes of deleted file and adding the renamed file
+ to git, we can use "git mv " command to do the same. No need to explicitly add the deleted file and renamed
+ file. 'git mv oldname.txt newname.txt' will rename the file and add those to staging automatically
+ _______________________________________________________
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ✚  git mv main.java move.java
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ✚  git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	renamed:    file1.txt -> move.java
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj  master ✚ 
+
+-------------------------------------------------------------------------------------------
+Ignoring Files:
+-------------------------------------------------------------------------------------------
+Create ".gitignore" file in the root of the project and update it with the info to make git to ignore
+
+.gitignore file should be composed with
+"/dirname" => to avoid a directory and all files inside it
+"filename.txt" => to avoid this file
+"*.log" => avoid all files with .log extension
+
+***** => .gitignore will work only if we havent included the file / dir in the repository
+if we have already committed a file eg: App.Java in local repository
+then including the file in .gitignore (App.java) and commiting the .gitignore changes
+if there are modification in file App.java, git will still show the changes and ask us to commit.
+we have to remove the file from the repository and then add it to .gitignore to make git to not track it.
+
+to remove the file from the repository, need to remove it from staging area and commit it repository
+at the same time the file/dir shouldnt be removed from the local repository
+
+>> "git rm --cached -r dirname" => will remove directory and all files inside dir only from staging area not
+                                   from the local repository
+
+"https://github.com/github/gitignore" contains various templates for various languages for git ignore
+
+-------------------------------------------------------------------------------------------
+Short Status
+-------------------------------------------------------------------------------------------
+>> git status -s
+
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	file1.js
+	file2.js
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  echo dive >> file1.js
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  echo dive > file3.js
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+?? file3.js
+
+_______________________________________________________
+first column is staging area, second column is working directory
+?                                  ?                      => represent file not present in both location
+                                   M                      => represent changes in wokring directory
+_______________________________________________________
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●   git add file1.js 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git status -s
+M  file1.js
+?? file3.js
+_______________________________________________________
+first column is staging area, second column is working directory
+?                                  ?                      => represent file not present in both location
+M                                                         => represent changes in staging directory
+_______________________________________________________
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git add file3.js 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git status -s
+M  file1.js
+A  file3.js
+
+_______________________________________________________
+first column is staging area, second column is working directory
+A                                                         => represent file added in stating area
+M                                                         => represent changes/modify in staging directory
+_______________________________________________________
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  echo "extra" >> file1.js
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●✚  git status -s
+MM file1.js
+A  file3.js
+
+_______________________________________________________
+first column is staging area, second column is working directory
+M                             M                            => represent changes/modify in staging directory, also
+                                                              additional changes in working directory
+_______________________________________________________
+
+
+
+-------------------------------------------------------------------------------------------
+Viewing Staged and Unstaged Changes
+-------------------------------------------------------------------------------------------
+view the code changes in staging area using "git diff --staged" - diff 
+                                                     the last commit repo code with staging code
+
+>git diff --staged
+diff --git a/file1.js b/file1.js  => a is repo code, b is staging code
+index f5e95e7..78343ab 100644
+--- a/file1.js
++++ b/file1.js
+@@ -1 +1,2 @@                     => in staging code changes are from line 1 to line 2
+ sky
++dive                             => + indicated the code added in staging code
+diff --git a/file3.js b/file3.js 
+new file mode 100644
+index 0000000..1bc5169
+--- /dev/null                     => indicated the file not present in repository
++++ b/file3.js                    
+@@ -0,0 +1 @@
++dive                             => + indicated the line added in staging area
+
+_______________________________________________________________________________
+view the code changes in working directory using "git diff" - diff 
+                                                      the staging area with working directory
+_______________________________________________________________________________
+>git diff
+diff --git a/file1.js b/file1.js  => a is staging area code, b is current working directory
+index 78343ab..f09506c 100644
+--- a/file1.js
++++ b/file1.js
+@@ -1,2 +1,3 @@                   => staging code line 1 to 2, working dir code line 1 to 3
+ sky
+ dive
++extra                            => code added in current working directory
+
+
+-------------------------------------------------------------------------------------------
+								VISUAL DIFF TOOLS
+-------------------------------------------------------------------------------------------
+p4merge, kdiff3, visualcode, winmerge(only windows)
+
+have to set 2 configuration settings to set a visual diff tool
+>> git config --global diff.tool vscode => giving a name to default diff tool
+
+have to tell git on how to launch diff tool
+>> git config --global difftool.vscode.cmd "code --wait --diff $LOCAL $REMOTE" => launch vscode
+
+
+>> "git difftool"  => to view changes between working directory and staging area in vscode
+
+>> "git difftool --staged" => to view changes between repository and staging area in vscode
+
+-------------------------------------------------------------------------------------------
+								VIEWING HISTORY
+-------------------------------------------------------------------------------------------
+
+>> git log => sorted from latest to earliest
+
+each commit is a unique identifier with 40chars of hexadecimal chars
+"master" is the main branch, main line of work done
+HEAD is the reference to the current branch
+Author, Email, Date and time and description
+
+commit 088cf45400028c8a1db6697e67adac7f7c8689fe (HEAD -> master)
+Author: Baskar K S <baskarks@gmail.com>
+Date:   Sat Sep 26 23:46:16 2020 +0530
+
+    removed move.java using git rm
+
+
+>> git log --oneline => short sumarry of commit
+unique identifier shortened to 7 chars
+only have one line description
+
+088cf45 (HEAD -> master) removed move.java using git rm
+242751e new changes
+09d79b5 added new files
+7e9f01e removing bin file in repo to avoid tracking it
+99dedc3 Adding entry in git ignore to avoid track bin files
+8370ec7 adding bit to repo
+22b605b Add Git ignore
+b63841a refactor code
+1bc5283 Again deleted file2.txt
+92e1f60 again file added
+95fc5a1 Removed unused code file2.txt
+c1b5e35 commit without staging the changes
+997c6d3 Initial commit
+
+
+
+>> git log --oneline --reverse => will show commits in sort order from earliest to latest
+
+997c6d3 Initial commit
+c1b5e35 commit without staging the changes
+95fc5a1 Removed unused code file2.txt
+92e1f60 again file added
+1bc5283 Again deleted file2.txt
+b63841a refactor code
+22b605b Add Git ignore
+8370ec7 adding bit to repo
+99dedc3 Adding entry in git ignore to avoid track bin files
+7e9f01e removing bin file in repo to avoid tracking it
+09d79b5 added new files
+242751e new changes
+088cf45 (HEAD -> master) removed move.java using git rm
+
+-------------------------------------------------------------------------------------------
+								VIEWING A COMMIT
+-------------------------------------------------------------------------------------------
+to investigate a commit to see the code changes submitted
+>> git show commit-reference (commit-reference are (using unique id 088cf45/ using HEAD pointer))
+>> git show 088cf45 / git show HEAD
+
+commit 088cf45400028c8a1db6697e67adac7f7c8689fe (HEAD -> master)
+Author: Baskar K S <baskarks@gmail.com>
+Date:   Sat Sep 26 23:46:16 2020 +0530
+
+    removed move.java using git rm
+
+diff --git a/move.java b/move.java
+deleted file mode 100644
+index 167608f..0000000
+--- a/move.java
++++ /dev/null
+@@ -1,3 +0,0 @@
+-hello
+-world
+-commit without staging
+
+
+>> "git show 242751e" / "git show HEAD~1" // HEAD~1 is one step previous of HEAD
+
+commit 242751e689450a838100aa6ac9b9721b22d83028
+Author: Baskar K S <baskarks@gmail.com>
+Date:   Sat Sep 26 23:44:04 2020 +0530
+
+    new changes
+
+diff --git a/file1.js b/file1.js
+index f5e95e7..f09506c 100644
+--- a/file1.js
++++ b/file1.js
+@@ -1 +1,3 @@
+ sky
++dive
++extra
+diff --git a/file3.js b/file3.js
+new file mode 100644
+index 0000000..1bc5169
+--- /dev/null
++++ b/file3.js
+@@ -0,0 +1 @@
++dive
+
+---------------------------------------------------------
+####### to see only the code changes of a file in a particular commit
+>> git show HEAD~1:file1.js // shows content of the file on the mentioned commit
+sky
+dive
+extra
+
+---------------------------------------------------------
+###### to see git objects (all the files and directories) present in git 
+                                                    at a particular commit
+>> git ls-tree HEAD // will show all files and dirs present in git when commit is at HEAD
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git ls-tree HEAD
+100644 blob 6b4e49aa4833e1bdfa468f10b3ea5ee07fd57eb7	.gitignore
+100644 blob b66ba06d315d46280bb09d54614cc52d1677809f	file1.js
+100644 blob f5e95e70e524ec32d0200e10ba179ab4c5f13884	file2.js
+040000 tree 38b3b5ce08f5b431336d86af3ca839194647c7a1	src
+
+---------------------------------------------------------
+Git Objects are :
+1. commits
+2. blobs (files)
+3. tree (dirs)
+4. tags
+
+git objects are identified with a unique identifier eg: 6b4e49aa4833e1bdfa468f10b3ea5ee07fd57eb7
+
+can view a git object using "git show object-identifier-no"
+---------------------------------------------------------
+viewing a blob using "git show"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git show 6b4e49aa4833e1bdfa468f10b3ea5ee07fd57eb7
+
+logs/
+some.bin
+---------------------------------------------------------
+viewing a tree using "git show"
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git show 38b3b5ce08f5b431336d86af3ca839194647c7a1
+
+tree 38b3b5ce08f5b431336d86af3ca839194647c7a1
+
+Hello.dart
+
+-------------------------------------------------------------------------------------------
+								UNSTAGING FILES (Reverting changes from staging area)
+-------------------------------------------------------------------------------------------
+
+"The changes added using "git add" into the staging area" is reverted back into lworking dir
+
+In earlier versions of git we use to do this operation using 
+"git reset --hard" / "git reset --soft"
+
+Latestly, git introduced command, "git restore" to do the same operation. to restore
+files in working directory and staging area.
+
+"git restore --staged ."            => to revert all files changes from 
+										staging area back to working dir
+"git restore --staged file1 file2"  => to revert only file1 and file2 changes 
+                                         from staging area back to working dir
+"git restore --staged *.java"   	=> to revert only *.java file changes 
+											from staging area back to working dir
+
+How git does this using restore: 
+								restore command takes the copy from the next environment,
+next to staging environment is last commit in repository environment, when we restore in staging
+area, git took the last snapshot/copy in repository and put it in staging area.
+
+_____________________________________________________________
+Eg: a change is made in file1.js and added to staging area, reverted the changes back to
+working directory. using command "git restore --staged file1.js"
+_____________________________________________________________
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  echo checking restore >> file1.js 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git add .
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git status -s
+M  file1.js
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   file1.js
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git restore --staged file1.js 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   file1.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+
+_____________________________________________________________
+//Eg: adding a new untracked file in staging area and remove it from staging area using
+git restore
+_____________________________________________________________
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  ls
+file1.js  file2.js  logs  some.bin  src
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status 
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   file1.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  echo "new file" > file3.js deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git add file3.js 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●✚  git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   file3.js
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   file1.js
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●✚  git status -s
+ M file1.js
+A  file3.js
+
+// could see the file3.js is added to the staging area
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●✚  git restore --staged file3.js 
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+?? file3.js
+
+// after restore, we could see file3.js is removed from the staging area
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   file1.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	file3.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+// can verify that file3.js is removed from staging area and now its untrackable because
+// its a new file yet not submitted to repository.
+
+
+-------------------------------------------------------------------------------------------
+				DISCARDING LOCAL CHANGES (Reverting changes done in wokring directory)
+-------------------------------------------------------------------------------------------
+"The changes made in local repository" is reverted back with old code to start over
+
+In earlier versions of git we use to do this operation using 
+"git reset --hard" / "git reset --soft"
+
+Latestly, git introduced command, "git restore" to do the same operation. to restore
+files in working directory and staging area.
+
+"git restore ."            => to revert all files changes from 
+										working directory with old code
+"git restore file1 file2"  => to revert only file1 and file2 changes 
+                                         in working directory with old code
+"git restore *.java"   	=> to revert only *.java file changes 
+											in working directory with old code
+
+How git does this using restore: 
+								restore command takes the copy from the next environment,
+next to working directory is staging environment, when we restore in working directory,
+git take the last snapshot/copy in staging area and put it in working directory.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+?? file3.js
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git restore .
+// all files in working direcory is reverted / overwrite with the snapshot copy of staging area
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git status -s
+?? file3.js
+//  still file3.js is untouched with restore command, because its was not tracked by git. git
+// doesnt know where to get previous version of file3.js, it doesnt exist in our staging area / 
+// reposirtory.
+__________________________________________________________________________________________
+Even to remove the untracked files from working directory we should use "git clean"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+?? file3.js
+
+// file1.js is tracked by git and its modified in working dir, file3.js is new file untracked by git
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git clean
+fatal: clean.requireForce defaults to true and neither -i, -n, nor -f given; refusing to clean
+
+// "git clean" will not be executed until with extra parameters, "git clean" will only remove
+// untracked files from wokring directory
+
+✘ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git clean -h
+usage: git clean [-d] [-f] [-i] [-n] [-q] [-e <pattern>] [-x | -X] [--] <paths>...
+
+    -q, --quiet           do not print names of files removed
+    -n, --dry-run         dry run
+    -f, --force           force
+    -i, --interactive     interactive cleaning
+    -d                    remove whole directories
+    -e, --exclude <pattern>
+                          add <pattern> to ignore rules
+    -x                    remove ignored files, too
+    -X                    remove only ignored files
+
+✘ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+?? file3.js
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git clean -fd
+Removing file3.js
+
+// f option is to force the clean operation, d option will remove directories also
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git status -s
+ M file1.js
+
+// can observe the git tracked modified files in working directory is not removed in "git clean",
+// the git tracked modified files in working directory is reverted with old copy of repository
+// changes using the "git restore". this will revert the working dir changes with the snapshot
+// copy of the staging area
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ●  git restore .
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git status -s
+                                                                                                            
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  
+// now no changes are observed
+
+-------------------------------------------------------------------------------------------
+				RESTORING A FILE TO ITS EARLIER VERSION
+-------------------------------------------------------------------------------------------
+
+once git tracks a file, it store every version of that file in its database
+if we screw things we can always restore a file/dir to its earlier versions
+
+Eg: delete a file and restoring it
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  ls
+file1.js  file2.js  logs  some.bin  src
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git status 
+On branch master
+nothing to commit, working tree clean
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git rm file2.js 
+rm 'file2.js'
+
+// deleting file2.js in both staging and working dir using "git rm"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git status -s
+D  file2.js
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master ✚  git commit -m "deleting file2"
+[master ab6e214] deleting file2
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 file2.js
+
+// commit the deleted file to repository
+_____________________________________________________________________________________
+// Recover the deleted file2.js by using 2 options
+// 1. undo / revert the last commit
+// 2. restoring the file to its previous version (not undo the last commit)
+_____________________________________________________________________________________
+
+Option2: How to restoring the file to its previous version (not undo the last commit)?
+
+//look into the history using "git log --oneline"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git log --oneline
+ab6e214 (HEAD -> master) deleting file2
+5ae4881 adding a Dir and others
+088cf45 removed move.java using git rm
+242751e new changes
+09d79b5 added new files
+7e9f01e removing bin file in repo to avoid tracking it
+99dedc3 Adding entry in git ignore to avoid track bin files
+8370ec7 adding bit to repo
+22b605b Add Git ignore
+b63841a refactor code
+1bc5283 Again deleted file2.txt
+92e1f60 again file added
+95fc5a1 Removed unused code file2.txt
+c1b5e35 commit without staging the changes
+997c6d3 Initial commit
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git restore -h
+usage: git restore [<options>] [--source=<branch>] <file>...
+
+// if we dont supply "--source" to "git restore", by default git will will take it from
+// the next environment, if the file we are trying to restore is in working dir, git will take
+// it from the next environment which is staging area. If the file we are trying to restore
+// is in staging area, git will take it from next environment which is repository (last snapshot).
+
+✘ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git restore --source=HEAD~1 file2.js
+
+// HEAD~1 is the version where the file is present in repository, at HEAD we could see the file is
+// deleted in repository, in order to restore the file2.js we have to restore it from  HEAD~1 version
+// from repository and then mention the particular file name to restore it. We dont restore the entire
+// commit, here we restore from a particular commit.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master  git status -s
+?? file2.js
+
+// file2.js is restored but not tracked by git, we have to again add it to git to track it again
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/FirstProj   master 
+
+-------------------------------------------------------------------------------------------
+				CHAPTER 2
+-------------------------------------------------------------------------------------------
+* search for commits using author, date, message etc
+* view a commit
+* restore project to a earlier point
+* compare commits
+* view history of a file
+* find a bad commit that introduce a bug
+
+Viewing:
+git log --oneline
+        --patch           => shows actual changes on each file
+        --stat            => shows changes count 
+
+Filtering:        
+
+git log --oneline -4                       => filter and show the mentioned 
+                                                       commit count from latest
+git log --oneline --author="Mosh"          => show only the mentioned author
+git log --oneline --after="2020-08-17"     => show commits after mentioned data
+git log --oneline --after="yesterday"
+git log --oneline --after="one month ago"
+git log --oneline --grep="text"            => show commits, on description 
+                                                            text(case sensitive)
+git log --oneline -S"text"                 => show commits, on text inside
+                                                              the code changes 
+git log --oneline dad47ed..555b62e         => show commits, between from and 
+                                                    to commit id, from exclusive.
+git log --oneline filename.txt             => show commits, all commits of 
+                                                             mentioned filename
+git log --oneline -- filename              => if before options make command 
+                                               ambiguous seperate filename with --
+
+Showing:
+
+git log --pretty=format:"Hello %an"        => string can contain text and place 
+                                                 holders(info inserted by git)
+
+place holders in string, replaced by git automatically
+%an - author name
+%H  - hex value of commit id in full length (40chars)
+%h  - hex value of commit id in short length (7chars)
+%cd - commit date
+%Cgreen - color green (text after this place holder will be this color)
+%Creset - default color of text of the command terminal (text after this 
+                                                   place holder will be this color)
+
+git log --pretty=format:"%Cgreen%an %Creset committed %Cred %h %Creset on %Cblue %cd"
+
+git config --global alias.lg "log --pretty=format:'%an committed %h'"
+git lg ===== git log --pretty=format:"%an committed %h"
+
+git config --global alias.unstage "restore --staged ."
+git config ===== git restore --staged .
+
+git show HEAD~2  => show third commit details from latest
+git show HEAD~2:full-path-of-file-with-filename
+git show HEAD~2:sections/creating-snapshots/staging-changes.txt => view the entire 
+                                                                      content of file
+git show HEAD~2 --name-only => show only full file path info, dont show file changes
+git show HEAD~2 --name-status => show only full file path info with 
+                                      status(added/removed), dont show file changes
+
+git diff HEAD~2 HEAD => show code changes in last 3 commits
+git diff HEAD~2 HEAD toc.txt => show code changes in last 3 commits for particular file
+git diff HEAD~2 HEAD --name-only => show full path info of file and dir in last 3 commits
+git diff HEAD~2 HEAD --name-status" => show full path info of file and dir in last
+                                             3 commits with (added/remove) info
+
+git checkout dad47ed          => checkout to the passed commit id, this will detach the head
+git log --oneline --all       => to see all commits in the repository, if the head is 
+                                  detached then 'git log --oneline' will not show other commits
+git checkout master           => detached head, to again make HEAD point to latest/master
+
+// BISECT
+
+ git bisect start             => start bisect on current repository
+ 
+ initially we need to give git about the bad and good commit.
+
+ git bisect bad               => intimate git that the current HEAD is bad code,  git will initialize with bad commit
+                                 if we dont mention the commmit no after bad, then the current HEAD is 
+                                 considered as bad.
+ git bisect good ca49180      => intimate git that the mentioned commit is good code, git will initialize
+                                 the mentioned commit to good
+
+after initializing the git with good and bad commit, take current code
+and check whether the bug is present in the code by intimating the git with command
+
+>> git bisect good
+>> git bisect bad
+
+based on that git will checkout automatically, recursively take code from code from
+code base and intimate git about the tested code that it contains bug or not by providing the 
+above commands
+
+once bug code commit is found, reset / stop the bisect operation with 
+
+git bisect reset                       => reset / stop the bisect operation with 
+
+git shortlog                           => show commits based on contributed persons
+git shortlog -n                        => sort and show commits based on contributed persons
+git shortlog -s                        => suppress commit messages and show commits based 
+                                                             on contributed persons
+git shortlog -e                        => show commits based on contributed with email
+git shortlog --after="" --before=""    => show commit based on a date range
+
+git checkout a642e12 toc.txt           => checkout code based on mentioned commit and particular file
+git blame filename                     => to know author of a code in a file, shows code info for 
+                                          each line with author, date and code
+git blame -e -L 1,3 audience.txt      => to know author of a code in a file, shows code info for 
+                                          each line with author, email for line no 1 to line no 3
+-------------------------------------------------------------------------------------------
+				VIEWING THE HISTORY
+-------------------------------------------------------------------------------------------
+>> git log --oneline => provide history of our repository commits in single line
+
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+
+>> git log --oneline --stat => will give the statistics of each commits
+
+a642e12 (HEAD -> master) Add header to all pages.
+ audience.txt                                    | 4 +++-
+ objectives.txt                                  | 1 +
+ sections/creating-snapshots/init.txt            | 2 +-
+ sections/creating-snapshots/staging-changes.txt | 2 +-
+ toc.txt                                         | 2 +-
+ 5 files changed, 7 insertions(+), 4 deletions(-)
+50db987 Include the first section in TOC.
+ toc.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+555b62e Include the note about committing after staging the changes.
+ sections/creating-snapshots/staging-changes.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+>> git log --stat
+commit a642e1229e3cb69be9bf075d9fe5e752e9a17458 (HEAD -> master)
+Author: Moshfegh Hamedani <moshfegh@live.com.au>
+Date:   Tue Aug 18 09:23:19 2020 -0700
+
+    Add header to all pages.
+
+ audience.txt                                    | 4 +++-
+ objectives.txt                                  | 1 +
+ sections/creating-snapshots/init.txt            | 2 +-
+ sections/creating-snapshots/staging-changes.txt | 2 +-
+ toc.txt                                         | 2 +-
+ 5 files changed, 7 insertions(+), 4 deletions(-)
+
+___________________________________________________________________
+// To see the actual changes submitted in each commit
+___________________________________________________________________
+>> git log --oneline --patch
+
+91f7d40 Explain various ways to stage changes.
+diff --git a/sections/creating-snapshots/staging-changes.txt b/sections/creating-snapshots/staging-changes.txt
+index 526c1e4..bddf7bd 100644
+--- a/sections/creating-snapshots/staging-changes.txt
++++ b/sections/creating-snapshots/staging-changes.txt
+@@ -2,4 +2,8 @@ STAGING CHANGES
+ ===============
+ To stage the changes, run:
+ 
+-> git add .
++> git add <filename>
++
++You can add multiple files separated by a space. 
++You can use a . to add all the files and subdirectories recursively.
+
+// can see the actual code changes sone on each file
+
+-------------------------------------------------------------------------------------------
+				FILTERING THE HISTORY
+-------------------------------------------------------------------------------------------
+* can filter the history by author , by date, by commit message, by content...
+
+>> git log --oneline -4 => to see the last 4 commits
+
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+
+
+* filter the history by author
+>> git log --oneline --author="Mosh"
+
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+
+*filter the author by date (--after="date", will show logs after the mentioned date)
+
+>> git log --oneline --after="2020-08-17"
+
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+
+* SHOW HISTORY FOR RELEVENT DATE MENTIONED
+>> git log --oneline --after="yesterday"
+>> git log --oneline --after="one month ago"
+>> git log --oneline --after="one week ago"
+>> git log --oneline --after="one year ago"
+>> git log --oneline --after="2 month"
+>> git log --oneline --after="two month"
+>> git log --oneline --after="50 day"
+
+*Filter by commit message / subject
+
+>> git log --oneline --grep="gui" => passed string is case sensitive
+
+>> git log --oneline --grep="GUI"
+24e86ee Add command line and GUI tools to the objectives.
+
+>> git log --oneline --grep="GUI" --patch
+
+24e86ee Add command line and GUI tools to the objectives.
+diff --git a/objectives.txt b/objectives.txt
+index 379003e..d31b40a 100644
+--- a/objectives.txt
++++ b/objectives.txt
+@@ -3,4 +3,5 @@ By the end of this course, you'll be able to
+ - Create snapshots 
+ - Browse history 
+ - Create and merge branches
+-- Collaborate with others
+\ No newline at end of file
++- Collaborate with others
++- Work with both the command line and visual tools
+\ No newline at end of file
+
+***** to search a string(either added / removed) in the file 
+										changes, we can use -S"search string" 
+
+>> git log --oneline -S"Collaborate"
+1ebb7a7 Define the objectives.
+
+>> git log --oneline -S"Collaborate" --patch
+
+1ebb7a7 Define the objectives.
+diff --git a/objectives.txt b/objectives.txt
+index 8b13789..379003e 100644
+--- a/objectives.txt
++++ b/objectives.txt
+@@ -1 +1,6 @@
+ 
++By the end of this course, you'll be able to 
++- Create snapshots 
++- Browse history 
++- Create and merge branches
++- Collaborate with others
+\ No newline at end of file
+
+
+****** filter history for a range of commits
+>> git log --oneline from-commit-hash..to-commit-hash // from commit no is excluded
+
+>> git log --oneline
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline dad47ed..555b62e
+
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+
+****** FIND ALL COMMITS WHICH ARE MADE TO A PARTICULAR FILE / GROUP OF FILES.
+
+>> git log --oneline "filename with extension"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline audience.txt
+
+a642e12 (HEAD -> master) Add header to all pages.
+fb0d184 Define the audience.
+ca49180 Initial commit.
+
+** WHEN THERE IS COMPLAINT FROM GIT THAT THE FILE NAME IS AMBIGUOS,
+       SEPERATE THE FILE NAME FROM THE OPTIONS PASSED TO GIT USING --
+>> git log --oneline -- filename
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline -- toc.txt
+
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+ca49180 Initial commit.
+
+--------------------------------------------------------------------------------------
+					FORMATTING THE LOG OUTPUT (customize the output of log command)
+--------------------------------------------------------------------------------------
+>> git log --pretty=format:"" => specify a format string in "", format string can contain
+                                text and place holders(info inserted by git) to display
+                                each commit information by the way we want.
+                                %an - an is author name
+                                %H - hash number
+                                %h - 7 digit hash no
+                                %cd - commit date
+                                %Cgreen - greencolor - append this before a placeholder to shon in green color
+                                %Creset - reset the color to white
+                                https://www.git-scm.com/docs/git-log for more info on help
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --pretty=format:"Hello %an"
+Hello Moshfegh Hamedani
+Hello Moshfegh Hamedani
+Hello Moshfegh Hamedani
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --pretty=format:"%an committed %H"
+
+Moshfegh Hamedani committed a642e1229e3cb69be9bf075d9fe5e752e9a17458
+Moshfegh Hamedani committed 50db98710ed4330773f1df55b2a177600d523c9e
+Moshfegh Hamedani committed 555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --pretty=format:"%an committed %h"
+Moshfegh Hamedani committed a642e12
+Moshfegh Hamedani committed 50db987
+Moshfegh Hamedani committed 555b62e
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --pretty=format:"%an committed %h on %cd"
+Moshfegh Hamedani committed a642e12 on Tue Aug 18 09:23:19 2020 -0700
+Moshfegh Hamedani committed 50db987 on Mon Aug 17 14:27:50 2020 -0700
+Moshfegh Hamedani committed 555b62e on Mon Aug 17 14:26:49 2020 -0700
+
+
+>> git log --pretty=format:"%Cgreen %an %Creset committed %h on %cd"
+Moshfegh Hamedani  committed a642e12 on Tue Aug 18 09:23:19 2020 -0700
+Moshfegh Hamedani  committed 50db987 on Mon Aug 17 14:27:50 2020 -0700
+Moshfegh Hamedani  committed 555b62e on Mon Aug 17 14:26:49 2020 -0700
+
+>> git log --pretty=format:"%Cgreen%an %Creset committed %Cred %h %Creset on %Cblue %cd"
+Moshfegh Hamedani  committed  a642e12  on  Tue Aug 18 09:23:19 2020 -0700
+Moshfegh Hamedani  committed  50db987  on  Mon Aug 17 14:27:50 2020 -0700
+Moshfegh Hamedani  committed  555b62e  on  Mon Aug 17 14:26:49 2020 -0700
+
+--------------------------------------------------------------------------------------
+						GIT ALIASES
+--------------------------------------------------------------------------------------
+can set aliases for the commands we use frequently
+
+created a alias "lg" for "log --pretty=format:'%an committed %h'"  and its mentioned in git config file
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git config --global alias.lg "log --pretty=format:'%an committed %h'"
+ 
+ deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git lg
+Moshfegh Hamedani committed a642e12
+Moshfegh Hamedani committed 50db987
+Moshfegh Hamedani committed 555b62e						
+
+----------//CREATING AN ALIAS TO UNSTAGE CHANGES ADDED TO STAGING AREA--------------
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git config --global alias.unstage "restore --staged ."
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  echo "new" >>toc.txt  
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  git add .  // changes added to staging area           
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚  git unstage // using alias to remove changes in staging area
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ●  
+
+--------------------------------------------------------------------------------------
+						VIEWING A COMMIT
+--------------------------------------------------------------------------------------
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git show HEAD~2
+commit 555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6
+Author: Moshfegh Hamedani <moshfegh@live.com.au>
+Date:   Mon Aug 17 14:26:49 2020 -0700
+
+    Include the note about committing after staging the changes.
+
+diff --git a/sections/creating-snapshots/staging-changes.txt b/sections/creating-snapshots/staging-changes.txt
+index bddf7bd..506a158 100644
+--- a/sections/creating-snapshots/staging-changes.txt
++++ b/sections/creating-snapshots/staging-changes.txt
+@@ -7,3 +7,5 @@ To stage the changes, run:
+ You can add multiple files separated by a space. 
+ You can use a . to add all the files and subdirectories recursively.
+ 
++Once you stage the changes, you need to commit them to store the 
++proposed snapshot permanently. 
+\ No newline at end of file
+
+*** TO VIEW A FINAL VERSION OF FILE ON A PARTICULAR COMMIT
+
+"git show HEAD~2:full-path-of-file-with-filename" // HEAD~2 or commit-no
+
+staging-changes.txt file was modified on HEAD~2(commit no) and its full path is 
+"/sections/creating-snapshots/staging-changes.txt"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git show HEAD~2:sections/creating-snapshots/staging-changes.txt
+
+--------------------------------------full content of staging-changes.txt file-------
+STAGING CHANGES 
+===============
+To stage the changes, run:
+
+> git add <filename>
+
+You can add multiple files separated by a space. 
+You can use a . to add all the files and subdirectories recursively.
+
+Once you stage the changes, you need to commit them to store the 
+proposed snapshot permanently. 
+--------------------------------------full content of staging-changes.txt file-------
+
+**** WHEN VIEWING A PARTICULAR COMMIT, DONT SHOW THE FILE CONTENT CHANGES
+										SHOW THE FILENAME WITH FULL PATH
+(avoid showing the content changes in a file using a flag "--name-only")
+shows only the file name with full path, but we cant know the file is added/modified/deleted
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git show HEAD~2 --name-only
+
+commit 555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6
+Author: Moshfegh Hamedani <moshfegh@live.com.au>
+Date:   Mon Aug 17 14:26:49 2020 -0700
+
+    Include the note about committing after staging the changes.
+
+sections/creating-snapshots/staging-changes.txt
+
+**** WHEN VIEWING A PARTICULAR COMMIT, DONT SHOW THE FILE CONTENT CHANGES
+      SHOW THE FILENAME WITH FULL PATH WITH STATUS(ADD/DELETED/MODIFIED)
+ 
+ can be acheived using "--name-status" flag
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git show HEAD~2 --name-status
+
+commit 555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6
+Author: Moshfegh Hamedani <moshfegh@live.com.au>
+Date:   Mon Aug 17 14:26:49 2020 -0700
+
+    Include the note about committing after staging the changes.
+
+M       sections/creating-snapshots/staging-changes.txt  // can see the file is modified
+
+
+--------------------------------------------------------------------------------------
+						VIEWING THE CHANGES ACROSS COMMIT
+--------------------------------------------------------------------------------------
+* TO VIEW CODE CHANGES ACROSS THE LAST 3 COMMITS > git diff HEAD~2 HEAD
+
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git diff HEAD~2 HEAD 
+ 
+diff --git a/audience.txt b/audience.txt
+index 6b3f8f5..4cfef55 100644
+--- a/audience.txt
++++ b/audience.txt
+@@ -1,2 +1,4 @@
++AUDIENCE 
++
+ This course is for anyone who wants to learn Git. 
+-No prior experience is required.
++No prior experience is required.
+\ No newline at end of file
+
+diff --git a/objectives.txt b/objectives.txt
+index d31b40a..c882718 100644
+--- a/objectives.txt
++++ b/objectives.txt
+@@ -1,3 +1,4 @@
++OBJECTIVES 
+ 
+ By the end of this course, you'll be able to 
+ - Create snapshots 
+
+* TO VIEW CODE CHANGES ACROSS THE LAST 3 COMMITS for PARTICULAR FILE > git diff HEAD~2 HEAD filename
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git diff HEAD~2 HEAD toc.txt
+
+diff --git a/toc.txt b/toc.txt
+index 8b13789..cc0798f 100644
+--- a/toc.txt
++++ b/toc.txt
+@@ -1 +1,5 @@
++TABLE OF CONTENT
+ 
++Creating Snapshots
++  - Initializing a repository
++  - Staging changes
+\ No newline at end of file
+
+* TO VIEW CODE CHANGES ACROSS THE LAST 3 COMMITS BUT "TO VIEW ONLY THE LIST OF FILES CHANGED" >
+                    "git diff HEAD~2 HEAD --name-only"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git diff HEAD~2 HEAD --name-only
+
+audience.txt
+objectives.txt
+sections/creating-snapshots/init.txt
+sections/creating-snapshots/staging-changes.txt
+toc.txt
+
+* TO VIEW CODE CHANGES ACROSS THE LAST 3 COMMITS BUT "TO VIEW ONLY THE LIST OF FILES CHANGED WITH STATUS" >
+                    "git diff HEAD~2 HEAD --name-status"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git diff HEAD~2 HEAD --name-status
+
+M       audience.txt
+M       objectives.txt
+M       sections/creating-snapshots/init.txt
+M       sections/creating-snapshots/staging-changes.txt
+M       toc.txt
+(END)
+
+--------------------------------------------------------------------------------------
+						CHECKING OUT A COMMIT
+--------------------------------------------------------------------------------------
+
+checking out a commit will restore the working directory to the snapshot stored in that commit
+hence our working directory will look exactly the way it looked in earlier point in time.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+
+each commit will point to next commit in order from 'first' to 'last'
+the 'last' commit is the latest commit to which the HEAD will be pointing
+'master' is the main branch / main line of work happens.
+
+in git we can have multiple branches to work things on parallel.
+
+in main branch, master moves forward to the latest commit (master and HEAD 
+will be pointing at latest commit)
+if we move the head to previous commit id then it will intimate us that HEAD is detached
+
+when the HEAD is in detached state(its not pointing to branch anymore its just 
+pointing a particular commit. When HEAD is detached we should not create new commits, we should
+only view commits etc. If we create a new commit then in future we cant reach to
+this commit and this is called a DEAD commit, periodically GIt checks and removes the
+DEAD commits to save space.
+
+restore the working directory to earlier point of time at commit id dad47ed
+
+>> git checkout dad47ed
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git checkout dad47ed
+Note: switching to 'dad47ed'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ dad47ed  git log --oneline
+dad47ed (HEAD) Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+OTHER COMMITS ARE NOT VISIBLE NOW, TO SEE ALL OTHER COMMITS IN CURRENT REPO USE "--all"
+
+>> git log --oneline --all
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ dad47ed  git log --oneline --all
+a642e12 (master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed (HEAD) Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+TO AGAIN MAKE THE HEAD POINTER ATTACH/POINT TO MASTER - "git checkout master"
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ dad47ed  git checkout master
+Previous HEAD position was dad47ed Write the first draft of initializing a repo.
+Switched to branch 'master'
+
+------------------------------------------------------------------------------------------
+								FINDING BUGS USING BISECT
+------------------------------------------------------------------------------------------
+tool to find bugs quickly
+
+when we find a bug in the application in latest commit, by checking out the code at half
+point in between a good code state and a bad code state recursively we can narrowdown
+and find the commit which caused the bug. Instead of manually checkout the code between 
+good code and bad code by finding a midpoint, we can automate it to git and narrowdown to
+find the problem.
+
+using bisect tool we can divide the history in half and checkout various commits
+to find the first bad commit. once we find the bad commit, attach the HEAD to master
+"git bisect reset"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+we have to give git about the details of "bad" and "good" commit
+
+on manual analysis, we figure out the problem in code is observed in "a642e12"(bad commit)
+(not working code)
+
+"ca49180" is identified as good commit. (working code)
+
+STEP 1: give command to intimate git to start bisect.
+>> git bisect start
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master    git bisect start
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master <B>  git l  
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+now HEAD is pointing to latest commit, to initimate git about the latest commit is bad
+>>git bisect bad
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master <B>  git bisect bad
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master <B>  git l      
+a642e12 (HEAD -> master, refs/bisect/bad) Add header to all pages.              (THIS COMMIT IS MARKED AS BAD)
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+we have to intimate git with details about good commit
+>> git bisect good ca49180
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master <B>  git bisect good ca49180
+Bisecting: 5 revisions left to test after this (roughly 3 steps)
+[36cd6db402cfd897810d4cb33d97ac1e9d1ce2d8] Include the command prompt in code sample.
+
+
+we could see the HEAD is detached and now its pointing the mid location between good and bad commit
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 36cd6db <B>  git log --oneline
+36cd6db (HEAD) Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 (refs/bisect/good-ca4918083ec471878d58612142572f3367faf5fd) Initial commit.
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 36cd6db <B> 
+
+to view the entire log history use "--all", we can see the HEAD is inbetween
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 36cd6db <B>  git log --oneline --all
+a642e12 (master, refs/bisect/bad) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db (HEAD) Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 (refs/bisect/good-ca4918083ec471878d58612142572f3367faf5fd) Initial commit.
+
+whatever bisect command we give it will intimate the git to take action on the current
+HEAD pointing location
+
+now if we use our code, its the code changes between the good commit and current HEAD
+location, if we test now and 
+figure out the issue is there (means the lower half contains the bug),
+figure out the issue is not there (means the upper half contains the bug)
+
+if we could'nt observe the issue to which the HEAD is pointing(currently which
+is inbetween the good and bad). we have to explore the upper half, to intimate
+the git bisect that the issue is not there
+
+>> git bisect good
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 36cd6db <B>  git bisect good
+Bisecting: 2 revisions left to test after this (roughly 2 steps)
+[91f7d40d6d5bbc336a271607a0488216aaf50cd7] Explain various ways to stage changes.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 91f7d40 <B>  git log --oneline --all
+a642e12 (master, refs/bisect/bad) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 (HEAD) Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db (refs/bisect/good-36cd6db402cfd897810d4cb33d97ac1e9d1ce2d8) Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 (refs/bisect/good-ca4918083ec471878d58612142572f3367faf5fd) Initial commit.
+
+we can observe that HEAD is NOW pointing at "91f7d40" and last good commit checkpoint is
+is "36cd6db"
+
+whatever we intimate to git(its in bisect now) either good/bad is applied on HEAD
+
+currently the code is compilation of initial commit to till HEAD, 
+if we couldnt find a issue means the issue is above the HEAD
+If we could find a issue then the problem is inbetween HEAD and last good commit(36cd6db)
+
+if we couldnt find issue, means the code is proper between initial commit to till HEAD
+have to ask git(now in bisect state) to explore code above HEAD, we can intimate git
+that the current HEAD pointing code is in good state(couldnt find the bug) we have to say
+
+>> git bisect good
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 91f7d40 <B>  git bisect good
+Bisecting: 0 revisions left to test after this (roughly 1 step)
+[50db98710ed4330773f1df55b2a177600d523c9e] Include the first section in TOC.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 50db987 <B>  git log --oneline --all
+a642e12 (master, refs/bisect/bad) Add header to all pages.
+50db987 (HEAD) Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 (refs/bisect/good-91f7d40d6d5bbc336a271607a0488216aaf50cd7) Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db (refs/bisect/good-36cd6db402cfd897810d4cb33d97ac1e9d1ce2d8) Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 (refs/bisect/good-ca4918083ec471878d58612142572f3367faf5fd) Initial commit.
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 50db987 <B> 
+
+now we can observe the current HEAD is at "50db987" and good code checkpoints are at
+"ca49180, 36cd6db, 91f7d40"
+if we use the code, then its the compilation between initial commit(ca49180) and HEAD(50db987)
+if we couldnt observe the issue, then the issue is at "a642e12"
+if we could observe the issue, then the issue is at "555b62e"
+
+when we test code and find the current code
+				(compilation between initial commit(ca49180) and HEAD(50db987))
+and find that the bug is present in current code, we intimate git that the bug present
+>>git bisect bad
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 50db987 <B>  git bisect bad
+Bisecting: 0 revisions left to test after this (roughly 0 steps)
+[555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6] Include the note about committing after staging the changes.
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 555b62e <B>  git log --oneline --all
+a642e12 (master) Add header to all pages.
+50db987 (refs/bisect/bad) Include the first section in TOC.
+555b62e (HEAD) Include the note about committing after staging the changes.
+91f7d40 (refs/bisect/good-91f7d40d6d5bbc336a271607a0488216aaf50cd7) Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db (refs/bisect/good-36cd6db402cfd897810d4cb33d97ac1e9d1ce2d8) Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 (refs/bisect/good-ca4918083ec471878d58612142572f3367faf5fd) Initial commit.
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 555b62e <B>  
+
+now the HEAD is at (555b62e) and the last good checkpoints are (ca49180, 36cd6db, 91f7d40)
+if we compile the current code, means the code contains changes between (ca49180 and 555b62e)
+and if we observe the bug in the app, we intimate the git(in bisect stage) by giving command
+>> git bisect bad
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 555b62e <B>  git bisect bad
+555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6 is the first bad commit
+commit 555b62e1ebb92c97fc69910ad0981a7d6dbbf8c6
+Author: Moshfegh Hamedani <moshfegh@live.com.au>
+Date:   Mon Aug 17 14:26:49 2020 -0700
+
+    Include the note about committing after staging the changes.
+
+ sections/creating-snapshots/staging-changes.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+now git conlcuded the bug was introduced in commit id (555b62e)
+now to stop bisect operation and again attach the HEAD to master we give command
+>>git bisect reset
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus  ➦ 555b62e <B>  git bisect reset
+Previous HEAD position was 555b62e Include the note about committing after staging the changes.
+Switched to branch 'master'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline --all
+a642e12 (HEAD -> master) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+
+----------------------------------------------------------------------------------------------
+					FINDING CONTRIBUTORS USING SHORTLOG
+----------------------------------------------------------------------------------------------
+
+to find out who all(persons) contributed to our project, we use command
+>>git shortlog
+Moshfegh Hamedani (13):
+      Initial commit.
+      Define the objectives.
+      Define the audience.
+      Write the first draft of initializing a repo.
+      Include the warning about removing .git directory.
+      Add a header to the page about initializing a repo.
+      Include the command prompt in code sample.
+      Add command line and GUI tools to the objectives.
+      First draft of staging changes.
+      Explain various ways to stage changes.
+      Include the note about committing after staging the changes.
+      Include the first section in TOC.
+      Add header to all pages.
+
+the output log message is sorted according to number of messages
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git shortlog -n
+Moshfegh Hamedani (13):
+      Initial commit.
+      Define the objectives.
+      Define the audience.
+      Write the first draft of initializing a repo.
+      Include the warning about removing .git directory.
+      Add a header to the page about initializing a repo.
+      Include the command prompt in code sample.
+      Add command line and GUI tools to the objectives.
+      First draft of staging changes.
+      Explain various ways to stage changes.
+      Include the note about committing after staging the changes.
+      Include the first section in TOC.
+      Add header to all pages.
+
+to suppress the commit messages and show the shortlog statistics
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git shortlog -n -s
+13  Moshfegh Hamedani
+
+to also know the email address of the author use "-e"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git shortlog -n -s -e
+    13  Moshfegh Hamedani <moshfegh@live.com.au>
+
+to know the contributors for a given date range use option --after="" and --before="" date
+range
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git shortlog -n -s -e --before="2020-08-17" --after="2020-09-30"
+
+------------------------------------------------------------------------------------------
+							VIEWING HISTORY OF A FILE
+------------------------------------------------------------------------------------------
+to view history of a file, which all commits touched the file
+>> git log filename
+>> git log --oneline filename
+>> git log --oneline --stat filename
+>> git log --patch --stat -- filename // if theres a ambigity to determine file name use "--"
+
+------------------------------------------------------------------------------------------
+							RESTORING A DELETING FILE
+------------------------------------------------------------------------------------------
+if we accidently delete a file, recover it from the history.
+
+// view all files
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  ls
+audience.txt  objectives.txt  sales-page.txt  sections  toc.txt
+
+// toc.txt got removed
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git rm toc.txt 
+rm 'toc.txt'
+
+//toc.txt got removed and updated in repo
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚  git commit -m "toc.txt file got removed"
+[master 5fa6a6b] toc.txt file got removed
+ 1 file changed, 5 deletions(-)
+ delete mode 100644 toc.txt
+
+// TO VIEW ALL COMMITS RELEVENT TO toc.txt
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline toc.txt
+fatal: ambiguous argument 'toc.txt': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+
+// since the command is ambiguous, add -- in from of file name
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline -- toc.txt
+5fa6a6b (HEAD -> master) toc.txt file got removed
+a642e12 Add header to all pages.
+50db987 Include the first section in TOC.
+ca49180 Initial commit.
+
+// checkout only for the file to its previous commit of the deleted commit
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git checkout a642e12 toc.txt
+Updated 1 path from 246d37c
+
+// could see the file got restored in working dir and added to staging
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚  git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   toc.txt
+
+
+// submit the restored file to repo to have the file
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master ✚  git commit -m "restored toc.txt file which got removed"
+[master 03d4871] restored toc.txt file which got removed
+ 1 file changed, 5 insertions(+)
+ create mode 100644 toc.txt
+
+
+------------------------------------------------------------------------------------------
+							FINDING THE AUTHOR OF LINE USING BLAME
+------------------------------------------------------------------------------------------
+
+to find the author for each line of code
+>> git blame filename
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git blame audience.txt 
+a642e122 (Moshfegh Hamedani 2020-08-18 09:23:19 -0700 1) AUDIENCE 
+a642e122 (Moshfegh Hamedani 2020-08-18 09:23:19 -0700 2) 
+fb0d184c (Moshfegh Hamedani 2020-08-17 14:18:09 -0700 3) This course is for anyone who wants to learn Git. 
+a642e122 (Moshfegh Hamedani 2020-08-18 09:23:19 -0700 4) No prior experience is required.
+
+to know the email id of the author also use '-e'
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git blame -e audience.txt 
+a642e122 (<moshfegh@live.com.au> 2020-08-18 09:23:19 -0700 1) AUDIENCE 
+a642e122 (<moshfegh@live.com.au> 2020-08-18 09:23:19 -0700 2) 
+fb0d184c (<moshfegh@live.com.au> 2020-08-17 14:18:09 -0700 3) This course is for anyone who wants to learn Git. 
+a642e122 (<moshfegh@live.com.au> 2020-08-18 09:23:19 -0700 4) No prior experience is required.
+
+for large files, to know the details for a particular line range
+>> git blame -e -L 1,3 audience.txt
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git blame -e -L 1,3 audience.txt 
+a642e122 (<moshfegh@live.com.au> 2020-08-18 09:23:19 -0700 1) AUDIENCE 
+a642e122 (<moshfegh@live.com.au> 2020-08-18 09:23:19 -0700 2) 
+fb0d184c (<moshfegh@live.com.au> 2020-08-17 14:18:09 -0700 3) This course is for anyone who wants to learn Git. 
+
+------------------------------------------------------------------------------------------
+							TAGGING
+------------------------------------------------------------------------------------------
+can use tag to reference a commit like a "shortcut name" / "bookmark"
+
+Two type of tags
+1. Light weight Tag (Just a reference / pointer to a particular commit)
+2. Annotated Tag (can give a dedicated properties(email, name, message) to a tag)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+03d4871 (HEAD -> master) restored toc.txt file which got removed
+5fa6a6b toc.txt file got removed
+a642e12 Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+"git tag tag-name commit-no"
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git tag v1.0 5fa6a6b
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+03d4871 (HEAD -> master) restored toc.txt file which got removed
+5fa6a6b (tag: v1.0) toc.txt file got removed
+a642e12 Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+can reference the commit using the tag
+>> git checkout v1.0
+>> git show v1.0 --patch
+
+to view all the created tags in our project
+>> git tag
+v1.0
+
+create a annotated tag by providing '-a' and also use '-m' to supply message
+
+git tag -a tag-name -m "tagMessage" commit-number(if not mentioned it uses HEAD)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git tag -a v0.9 -m "Old Version" a642e12
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+03d4871 (HEAD -> master) restored toc.txt file which got removed
+5fa6a6b (tag: v1.0) toc.txt file got removed
+a642e12 (tag: v0.9) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
+
+to see list of tags
+>> git tag
+v0.9  // this is created latestly
+v1.0
+
+to see tags along with the tag messages
+>> git tag -n
+v0.9            Old Version               // this message we supplied
+v1.0            toc.txt file got removed   // if we dont give message, it uses commit msg
+
+to view a commit using tag name
+>>git show v0.9 // this is a annotated tag
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git show v0.9
+tag v0.9
+Tagger: Baskar K S <baskarks@gmail.com>
+Date:   Thu Oct 1 20:08:46 2020 +0530
+
+Old Version
+
+commit a642e1229e3cb69be9bf075d9fe5e752e9a17458 (tag: v0.9)
+Author: Moshfegh Hamedani <moshfegh@live.com.au>
+Date:   Tue Aug 18 09:23:19 2020 -0700
+
+    Add header to all pages.
+
+diff --git a/audience.txt b/audience.txt
+index 6b3f8f5..4cfef55 100644
+--- a/audience.txt
++++ b/audience.txt
+@@ -1,2 +1,4 @@
++AUDIENCE 
++
+ This course is for anyone who wants to learn Git. 
+-No prior experience is required.
++No prior experience is required.
+
+to delete a tag use '-d' option
+git tag -d tag-name
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git tag -d v1.0
+Deleted tag 'v1.0' (was 5fa6a6b)
+
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git tag
+deni@deni-notebook  ~/Documents/Learnings/Git/codewithmosh/Venus/Venus   master  git log --oneline
+
+03d4871 (HEAD -> master) restored toc.txt file which got removed
+5fa6a6b toc.txt file got removed
+a642e12 (tag: v0.9) Add header to all pages.
+50db987 Include the first section in TOC.
+555b62e Include the note about committing after staging the changes.
+91f7d40 Explain various ways to stage changes.
+edb3594 First draft of staging changes.
+24e86ee Add command line and GUI tools to the objectives.
+36cd6db Include the command prompt in code sample.
+9b6ebfd Add a header to the page about initializing a repo.
+fa1b75e Include the warning about removing .git directory.
+dad47ed Write the first draft of initializing a repo.
+fb0d184 Define the audience.
+1ebb7a7 Define the objectives.
+ca49180 Initial commit.
